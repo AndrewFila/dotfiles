@@ -1,0 +1,13 @@
+#!/bin/bash
+# usage: proj [projects-dir]
+# Pick a project from ~/projects (or the given dir) and open it with dev.
+
+set -euo pipefail
+
+ROOT=${1:-$HOME/projects}
+
+dir=$(find "$ROOT" -mindepth 1 -maxdepth 1 -type d -not -name '.*' -printf '%f\n' |
+    sort | fzf --prompt='project> ' --height=40% --reverse \
+        --preview "ls -A --color=always '$ROOT'/{}" --preview-window=right,50%) || exit 0
+
+exec dev "" "$ROOT/$dir"

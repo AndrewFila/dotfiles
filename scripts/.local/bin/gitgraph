@@ -1,0 +1,15 @@
+#!/bin/bash
+# usage: gitgraph [dir]
+# Show the commit graph of every branch for the repo at dir (default: here).
+
+set -uo pipefail
+
+cd "${1:-$PWD}" || exit 1
+
+if ! git rev-parse --git-dir >/dev/null 2>&1; then
+    echo "Not a git repository: $PWD"
+    read -rn1 -p "Press any key to close"
+    exit 1
+fi
+
+git log --graph --all --decorate --oneline --color=always | less -RX

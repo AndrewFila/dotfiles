@@ -1,0 +1,23 @@
+#!/bin/bash
+# usage: tkill [-a]
+# Pick tmux sessions to kill (Tab marks several). With -a, kill the whole
+# tmux server and every session in it.
+
+set -euo pipefail
+
+if [ "${1:-}" = "-a" ]; then
+    tmux kill-server
+    exit
+fi
+
+sessions=$(tmux list-sessions -F '#{session_name}  (#{session_windows} windows#{?session_attached, attached,})' 2>/dev/null) || {
+    echo "No tmux sessions running"
+    exit 0
+}
+
+picked=$(echo "$sessions" | fzf --multi --prompt='kill> ' --height=40% --reverse \
+    --header='Tab to mark, Enter to kill') || exit 0
+
+echo "$picked" | awk '{print $1}' | while read -r name; do
+    tmux kill-session -t "=$name"
+done

@@ -1,0 +1,13 @@
+#!/bin/bash
+# usage: tscratch [start-dir]
+# Attach to the persistent "scratch" session, creating it on first use.
+# Bound to prefix+t as a popup; the same key detaches from inside it.
+
+set -euo pipefail
+
+tmux has-session -t "=scratch" 2>/dev/null ||
+    tmux new-session -d -s scratch -c "${1:-$HOME}"
+tmux set-option -t scratch status off
+
+# The popup already runs inside tmux, so unset TMUX to allow the nested attach
+exec env -u TMUX tmux attach -t "=scratch"
