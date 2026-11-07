@@ -1,53 +1,14 @@
 #!/bin/bash
-# auto - scaffold a new executable bash script
-# usage: auto <script-name> [description]
-#
-# The banner is drawn with figlet or toilet, whichever is installed.
-# Set AUTO_FONT to pick a font; otherwise it tries "small", then "future".
-# Fonts for both tools live in /usr/share/figlet.
 
-set -euo pipefail
+SCRIPT_FOLDER="$HOME/scripts"
+SCRIPT_FILE="$SCRIPT_FOLDER/$1"
 
-if [ $# -lt 1 ]; then
-  echo "usage: auto <script-name> [description]" >&2
-  exit 1
+if [[ -f $SCRIPT_FILE ]]; then
+    vim $SCRIPT_FILE
+    echo Script $1 already exist, opening file
+else 
+    echo '#!/bin/bash' > $SCRIPT_FILE
+    chmod +x $SCRIPT_FILE
+    vim $SCRIPT_FILE
+    echo Script $1 created
 fi
-
-file=$1
-desc=${2:-}
-name=$(basename "$file")
-
-if [ -e "$file" ]; then
-  echo "auto: $file already exists, not overwriting" >&2
-  exit 1
-fi
-
-# Print the script name as a commented banner.
-# Falls back to a plain one-line comment when no tool or font is available.
-banner() {
-  local tool font art
-  tool=$(command -v figlet || command -v toilet || true)
-  if [ -n "$tool" ]; then
-    for font in ${AUTO_FONT:-small future}; do
-      if art=$("$tool" -f "$font" -- "$name" 2>/dev/null); then
-        printf '%s\n' "$art" |
-          awk '{ sub(/[ \t]+$/, ""); print ($0 == "" ? "#" : "# " $0) }'
-        return
-      fi
-    done
-  fi
-  echo "# $name"
-}
-
-{
-  echo '#!/bin/bash'
-  banner
-  [ -n "$desc" ] && echo "# $desc"
-  echo
-  echo 'set -euo pipefail'
-  echo
-} > "$file"
-
-chmod +x "$file"
-echo "created $file"
-

@@ -26,7 +26,6 @@ export NVM_DIR="$HOME/.nvm"
 
 # Go to projects
 export PROJECTS="$HOME/projects"
-alias proj='cd $PROJECTS'
 export PATH="$HOME/.local/bin:$PATH"
 
 # Machine-specific / private settings (not tracked)
