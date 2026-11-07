@@ -66,6 +66,10 @@ git clone git@github.com:AndrewFila/dotfiles.git ~/dotfiles
 If a real file is already where Stow wants to put a link, Stow stops and
 lists the conflicts. Move those files aside and run it again.
 
+To update a machine later, run `~/dotfiles/install.sh --update`. It pulls,
+checks for conflicts before touching anything, and then re-links. Editing
+files that already exist needs only `git pull`.
+
 ## Local overrides
 
 `~/.zshrc` sources `~/.zshrc.local` if it exists. Machine-specific or
