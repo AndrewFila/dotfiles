@@ -1,0 +1,38 @@
+#!/bin/bash
+#     _
+#  __| |_____ __
+# / _` / -_) V /
+# \__,_\___|\_/
+#
+# usage: dev [session-name] [project-dir]
+
+set -euo pipefail
+
+DIR=${2:-$PWD}
+SESSION=${1:-$(basename "$DIR" | tr . _)} # tmux doesn't allow dots in names
+
+attach() {
+    if [ -n "${TMUX:-}" ]; then
+        tmux switch-client -t "=$SESSION"
+    else tmux attach -t "=$SESSION"; fi
+}
+
+tmux has-session -t "=$SESSION" 2>/dev/null && {
+    attach
+    exit
+}
+
+# Create the session detached; capture the first pane's ID (the editor)
+editor=$(tmux new-session -d -s "$SESSION" -c "$DIR" \
+    -x "$(tput cols)" -y "$(tput lines)" -P -F '#{pane_id}')
+
+# Right sidebar: AI agent, 35% of the width, full height
+ai=$(tmux split-window -h -l 35% -t "$editor" -c "$DIR" -P -F '#{pane_id}')
+
+# Bottom terminal: 25% of the height, under the editor only
+tmux split-window -v -l 25% -t "$editor" -c "$DIR"
+
+tmux send-keys -t "$editor" 'nvim' Enter
+tmux send-keys -t "$ai" 'claude' Enter # swap in your tool's command
+tmux select-pane -t "$editor"
+attach

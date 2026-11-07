@@ -1,0 +1,7 @@
+# Windows metadata from copying files via Explorer
+*:Zone.Identifier
+
+# Editor / OS junk
+*.swp
+.DS_Store
+.netrwhist
